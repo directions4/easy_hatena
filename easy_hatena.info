@@ -1,0 +1,7 @@
+name = Easy Hatena
+description = Hatena Bookmark module with Easy Social.
+package = Other
+core = 7.x
+dependencies[] = easy_social
+version = "7.x-1.0"
+project = "easy_hatena"

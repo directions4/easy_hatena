@@ -1,0 +1,125 @@
+<?php
+/**
+ * @file
+ * Easy Hatena module.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function easy_hatena_menu() {
+  $items = array();
+  $items['admin/config/content/easy_social/widget-extra/hatena'] = array(
+    'title' => 'Hatena',
+    'description' => 'Extra settings for Hatena Bookmark',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('_easy_social_admin_config_extra_hatena'),
+    'access arguments' => array('administer easy social'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_easy_social_widget().
+ */
+function easy_hatena_easy_social_widget() {
+  return array(
+    'hatena' => array(
+      'name' => 'Hatena',
+      'markup' => '_easy_hatena_custom_share_button_markup',
+      'scripts' => array(
+        array(
+          'path' => '//b.st-hatena.com/js/bookmark_button.js',
+          'type' => 'external',
+        ),
+      ),
+      'styles' => array(
+        array(
+          'path' => drupal_get_path('module', 'easy_hatena') . '/css/easy_hatena.css',
+          'type' => 'module',
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Generate the needed markup for the Hatena bookmark.
+ *
+ * @param $url The url to be shared
+ * @param $type Generate horizontal or vertical widgets
+ * @param $title The title to be shared
+ * @param $lang The language of the facebook button
+ * @return string the html markup
+ */
+function _easy_hatena_custom_share_button_markup($url, $type, $title = NULL, $lang = "ja") {
+  $layout = variable_get_value('easy_social_hatena_layout');
+  $lang = variable_get_value('easy_social_hatena_lang');
+  if ($type == EASY_SOCIAL_WIDGET_VERTICAL && $layout == 'standard-balloon') {
+    $bookmark_layout = 'vertical-balloon';
+  }
+  else {
+    $bookmark_layout = $layout;
+  }
+  $markup = <<<HATENA
+  <a href="{$url}" class="hatena-bookmark-button" data-hatena-bookmark-title="{$title}" data-hatena-bookmark-layout="{$bookmark_layout}" data-hatena-bookmark-lang="{$lang}" title="この記事をはてなブックマークに追加">
+  <img src="//b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" />
+  </a>
+HATENA;
+
+  return $markup;
+}
+
+/**
+ * Implements hook_variable_info().
+ */
+function easy_hatena_variable_info() {
+  $variables = array();
+  $variables['easy_social_hatena_layout'] = array(
+    'title' => t("Easy Social Global Hatena Type of Layouts option"),
+    'default' => 'simple',
+    'group' => 'easy_social',
+    'token' => FALSE,
+  );
+  $variables['easy_social_hatena_lang'] = array(
+    'title' => t("Easy Social Global Hatena language option"),
+    'default' => 'ja',
+    'group' => 'easy_social',
+    'token' => FALSE,
+  );
+  return $variables;
+}
+
+/**
+ * Implements the settings form callback.
+ */
+function _easy_social_admin_config_extra_hatena() {
+  $form = array();
+  $form['easy_social_hatena_title'] = array(
+    '#markup' => '<h4>' . t('Hatena widget settings') . '</h4>',
+  );
+  $form['easy_social_hatena_info'] = array(
+    '#markup' => t('For more information check out the official Hatena bookmark widget <a href="!link" target="_blank">documentation</a>.',
+      array('!link' => 'http://b.hatena.ne.jp/guide/bbutton')),
+  );
+  $form['easy_social_hatena_layout'] = array(
+    '#type' => 'select',
+    '#title' => t("Type of layouts"),
+    '#default_value' => variable_get_value('easy_social_hatena_layout'),
+    '#options' => array(
+      'standard-noballoon' => t('Standard button'),
+      'standard-balloon' => t('Standard button with balloon'),
+    ),
+  );
+  $form['easy_social_hatena_lang'] = array(
+    '#type' => 'select',
+    '#title' => t("Language"),
+    '#default_value' => variable_get_value('easy_social_hatena_lang'),
+    '#options' => array(
+      'ja' => t('Japanese'),
+      'en' => t('English')
+    ),
+  );
+  return system_settings_form($form);
+}

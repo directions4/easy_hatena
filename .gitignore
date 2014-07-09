@@ -1,0 +1,14 @@
+# Working files
+.DS_Store
+*~
+*.swp
+
+# Drupal
+sites/*/settings*.php
+sites/*/files
+sites/*/private
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
